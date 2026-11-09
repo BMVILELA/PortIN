@@ -383,6 +383,16 @@ table.bo tfoot td,table.mxt thead .stk,table.mxt tfoot .stk{background:var(--sur
 .act{padding:13px 8px;border-radius:12px;background:var(--fill);color:var(--fg);font-weight:600;font-size:15px}
 .act:disabled{color:var(--dim);cursor:default}
 .act.del.on{color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,transparent)}
+/* variante gradiente */
+:root{--grad:linear-gradient(120deg,#c25cff 0%,#5b4dff 48%,#2fd0ff 100%);--gold:#38c8ff;--gold-2:#7fdcff;--gold-ink:#ffffff;--cards:#9d7bff;--cards-soft:rgba(157,123,255,.22)}
+.save{background:var(--grad);color:#fff;box-shadow:0 10px 26px -14px rgba(91,77,255,.9)}
+.save:disabled{background:var(--fill);color:var(--dim);box-shadow:none}
+.cd.sel{background:var(--grad);color:#fff}
+.ga b{background:var(--gg,var(--grad));-webkit-background-clip:text;background-clip:text;color:transparent}
+.ga.adm{background:var(--grad)}
+.ga.adm b{background:none;-webkit-text-fill-color:#fff;color:#fff}.ga.adm .t,.ga.adm .s{color:#fff}
+.acum-bar i,.res .bar i,.mbar i,.rrow .bar i,.stack i{background:var(--grad)}
+.top svg rect:last-of-type{fill:#38c8ff}
 /* barra inferior */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:9;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:8px max(16px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 .tabbar .in{max-width:480px;margin:0 auto;display:flex;gap:8px}
@@ -431,6 +441,7 @@ const STORES = [{"s":"O.000.797","n":"Albufeira - Albufeira Terrace","k":"FMS","
 const KAMS = {IFC:{nome:"Ivo Carvalho",zona:"Norte & Centro"},FMS:{nome:"Filipe Silva",zona:"Lisboa & Sul"}};
 const GAS={AGF:"Alexandre Ferreira",ANN:"Alexandra Nogueira",ARM:"Ana Morais",BGC:"Bruno Carbone",BMC:"Bruno Caio",BMV:"Bruno Vilela",CFE:"Carlos Engrácio",EMR:"Elisabete Raimundo",LFM:"Liliana Machado",MNF:"Manuel Fernandes",PCM:"Paula Meireles",PSM:"Pedro Martins",SCT:"Susana Teles"};
 const GA_ORDER=Object.keys(GAS).sort();
+const GRADS=["#c25cff,#5b4dff","#5b4dff,#2fd0ff","#2fd0ff,#2ef2b0","#ff5ac8,#9b5cff","#ff8a5c,#ff3d9a","#ffb347,#ff5f6d","#2ef2b0,#8be04e","#8f8cff,#d7a8ff","#00c6ff,#3d6bff","#f857a6,#ff6a5c","#43e97b,#38d9f9","#b28cff,#ff9de2","#ff6f91,#ffc75f"];
 const MIN_CARTOES=5;
 let INICIO="2026-11-09"; // primeiro dia de registo (vem da base de dados)
 const BY=new Map(STORES.map(s=>[s.s,s]));
@@ -486,7 +497,7 @@ function go(sc){S.screen=sc;render();scrollTo({top:0})}
 
 function vGa(){
   $("view").innerHTML=`<h1 class="title">Quem é o teu GA?</h1><p class="muted" style="margin:0">Depois escolhes a tua loja.</p>
-  <div class="gas">${GA_ORDER.map(g=>`<button class="ga" data-g="${g}"><b>${g}</b><span class="t">${GAS[g]}</span><span class="s">${STORES.filter(s=>s.g===g).length} lojas</span></button>`).join("")}<button class="ga adm" id="boTile"><b>BO</b><span class="t">Admin</span><span class="s">com password</span></button></div>`;
+  <div class="gas">${GA_ORDER.map(g=>`<button class="ga" data-g="${g}" style="--gg:linear-gradient(120deg,${GRADS[GA_ORDER.indexOf(g)%GRADS.length]})"><b>${g}</b><span class="t">${GAS[g]}</span><span class="s">${STORES.filter(s=>s.g===g).length} lojas</span></button>`).join("")}<button class="ga adm" id="boTile"><b>BO</b><span class="t">Admin</span><span class="s">com password</span></button></div>`;
   document.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{S.ga=b.dataset.g;S.q="";go("loja")});
   $("boTile").onclick=()=>go("bo");
 }
