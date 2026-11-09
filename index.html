@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,7 +17,7 @@ body{margin:0}img{max-width:100%}[hidden]{display:none!important}
 :root{
   --bg:#000000; --surface:#1c1c1e; --surface-2:#2c2c2e; --fill:rgba(118,118,128,.24); --line:rgba(84,84,88,.55);
   --fg:#ffffff; --muted:rgba(235,235,245,.6); --dim:rgba(235,235,245,.3);
-  --gold:#e0b45c; --gold-2:#f0cf8c; --gold-ink:#1a1306; --seg-on:#636366;
+  --gold:#ff007f; --gold-2:#ff5aa8; --gold-ink:#ffffff; --seg-on:#636366;
   --cards:#7d7aff; --cards-soft:rgba(125,122,255,.2);
   --good:#30d158; --bad:#ff453a;
   --t-dia:#64d2ff; --t-ouro:#e0b45c; --t-prata:#c7c7cc; --t-bronze:#d0905f;
@@ -24,24 +25,7 @@ body{margin:0}img{max-width:100%}[hidden]{display:none!important}
   --f-body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   color-scheme:dark;
 }
-@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
-  --bg:#f2f2f7; --surface:#ffffff; --surface-2:#f2f2f7; --fill:rgba(118,118,128,.12); --line:rgba(60,60,67,.18);
-  --fg:#000000; --muted:rgba(60,60,67,.6); --dim:rgba(60,60,67,.3);
-  --gold:#a8741a; --gold-2:#c99236; --gold-ink:#ffffff; --seg-on:#ffffff;
-  --cards:#5856d6; --cards-soft:rgba(88,86,214,.14);
-  --good:#248a3d; --bad:#d70015;
-  --t-dia:#0071a4; --t-ouro:#a8741a; --t-prata:#8e8e93; --t-bronze:#a2643a;
-  color-scheme:light;
-}}
-:root[data-theme="light"]{
-  --bg:#f2f2f7; --surface:#ffffff; --surface-2:#f2f2f7; --fill:rgba(118,118,128,.12); --line:rgba(60,60,67,.18);
-  --fg:#000000; --muted:rgba(60,60,67,.6); --dim:rgba(60,60,67,.3);
-  --gold:#a8741a; --gold-2:#c99236; --gold-ink:#ffffff; --seg-on:#ffffff;
-  --cards:#5856d6; --cards-soft:rgba(88,86,214,.14);
-  --good:#248a3d; --bad:#d70015;
-  --t-dia:#0071a4; --t-ouro:#a8741a; --t-prata:#8e8e93; --t-bronze:#a2643a;
-  color-scheme:light;
-}
+
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{background:var(--bg)}
 body{color:var(--fg);font:16px/1.45 var(--f-body);-webkit-font-smoothing:antialiased}
@@ -333,8 +317,6 @@ body.bo .dpick,body.bo .fsel select{background:var(--fill)}
 .stepper{grid-template-columns:50px 1fr 50px;gap:10px}
 .stepper button{border-radius:50%;width:50px;height:50px;justify-self:center;background:var(--fill);font-size:26px;font-weight:400}
 .stepper input{border:0;background:var(--fill);border-radius:12px;height:50px;font:600 26px/1 var(--f-body);color:#fff;letter-spacing:0}
-@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .stepper input{color:var(--fg)}}
-:root[data-theme="light"] .stepper input{color:var(--fg)}
 .res{background:var(--fill);border-radius:12px;padding:12px 14px;gap:14px}
 .res .rl{display:grid;gap:2px;min-width:86px}
 .res .rl small{font-size:12px;font-weight:600;color:var(--muted)}
@@ -397,6 +379,10 @@ table.bo tfoot td,table.mxt thead .stk,table.mxt tfoot .stk{background:var(--sur
 .sheet-in img{width:100%;border-radius:10px;display:block}
 .sheet-b{display:grid;gap:8px}
 .sheet-b a.zero{display:block;text-align:center;text-decoration:none}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.act{padding:13px 8px;border-radius:12px;background:var(--fill);color:var(--fg);font-weight:600;font-size:15px}
+.act:disabled{color:var(--dim);cursor:default}
+.act.del.on{color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,transparent)}
 /* barra inferior */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:9;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:8px max(16px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 .tabbar .in{max-width:480px;margin:0 auto;display:flex;gap:8px}
@@ -546,8 +532,8 @@ function vReg(){
     <div class="res"><span class="rl"><small>Taxa do dia</small><span class="tx num" id="tx"></span></span><span class="bar"><i id="bar"></i><s style="left:${S.objetivo*100}%"></s><em style="left:${S.objetivo*100}%">objetivo ${fmtPct(S.objetivo)}</em></span></div>
     <p class="hint" id="hint"></p>
     <button class="save" id="save"></button>
-    <button class="zero" id="zero">Não houve vendas neste dia (guardar 0)</button>
-    ${draft.had?(S.del?`<div class="delc"><span>Apagar o registo deste dia? Fica como dia por preencher.</span><button id="delY">Sim, apagar</button><button id="delN">Cancelar</button></div>`:`<button class="dellink" id="del">Registei no dia errado: apagar este registo</button>`):""}
+    <div class="acts"><button class="act" id="zero" title="Guardar 0 Voz Móvel e 0 portabilidades neste dia">Sem vendas</button><button class="act del ${draft.had?"on":""}" id="del" ${draft.had?"":"disabled"} title="Apagar o registo deste dia">Apagar registo</button></div>
+    ${draft.had&&S.del?`<div class="delc"><span>Apagar o registo deste dia? Fica como dia por preencher.</span><button id="delY">Sim, apagar</button><button id="delN">Cancelar</button></div>`:""}
   </div>
   <div class="card acum"><div class="acum-h"><span>Acumulado de ${MESES[today().getMonth()]}</span><small>${diasMes} dia${diasMes===1?"":"s"} registado${diasMes===1?"":"s"}</small></div>
     <div class="acum-g"><div><b class="num" style="color:var(--cards)">${a?a.c:0}</b><span>Voz Móvel</span></div><div><b class="num" style="color:var(--gold)">${a?a.p:0}</b><span>Portabilidades</span></div><div><b class="num" style="color:${mt!=null&&mt>=S.objetivo?"var(--good)":"var(--fg)"}">${fmtPct(mt)}</b><span>Taxa</span></div></div>
@@ -571,7 +557,7 @@ function upd(){
   const{c,p}=draft,t=c?p/c:null,bad=p>c;
   $("tx").textContent=fmtPct(t);$("tx").classList.toggle("up",t!=null&&t>=S.objetivo);$("bar").style.width=(t==null?0:Math.min(1,t)*100)+"%";
   const h=$("hint");h.classList.toggle("err",bad);
-  h.textContent=bad?"Não podes ter mais portabilidades do que Voz Móvel.":t==null?"Sem vendas de Voz Móvel? Guarda 0, o dia conta como preenchido.":t>=S.objetivo?"Acima do objetivo. Boa!":"Abaixo do objetivo.";
+  h.textContent=bad?"Não podes ter mais portabilidades do que Voz Móvel.":t==null?"Se não houve vendas neste dia, carrega em Sem vendas.":t>=S.objetivo?"Acima do objetivo. Boa!":"Abaixo do objetivo.";
   const b=$("save");b.disabled=bad||!db||S.canWrite===false||saving;b.textContent=saving?"A guardar…":draft.had?"Guardar correção":"Guardar dia";const z=$("zero");if(z)z.disabled=!db||S.canWrite===false||saving;
 }
 async function save(del){
