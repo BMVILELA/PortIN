@@ -431,6 +431,7 @@ table.bo tfoot td,table.mxt thead .stk,table.mxt tfoot .stk{background:var(--sur
 .cfg-d{display:grid;grid-template-columns:1fr 160px;gap:10px;align-items:center}
 .cfg-d input{height:42px;border:0;border-radius:10px;background:var(--fill);color:var(--fg);font:500 15px var(--f-body);padding:0 10px;width:100%;color-scheme:dark}
 @media (max-width:420px){.cfg-d{grid-template-columns:1fr}}
+.cd.sel.cmiss{background:var(--bad);color:#fff;box-shadow:0 0 0 3px color-mix(in srgb,var(--bad) 35%,transparent)}
 /* barra inferior */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:9;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:8px max(16px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 .tabbar .in{max-width:480px;margin:0 auto;display:flex;gap:8px}
