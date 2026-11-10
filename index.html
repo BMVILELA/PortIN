@@ -410,6 +410,23 @@ table.bo tfoot td,table.mxt thead .stk,table.mxt tfoot .stk{background:var(--sur
 .cfg-r input{height:48px;border:0;border-radius:12px;background:var(--fill);color:var(--fg);font:600 22px var(--f-body);text-align:center;width:100%}
 .cfg-r .save{margin:0;padding:14px}
 .cfg-n{margin:0;font-size:13px;color:var(--muted)}
+.fpanel{background:var(--surface);border-radius:14px;padding:14px;margin:0 0 14px;display:grid;gap:10px}
+.fgrid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:end}
+.fpanel .fsel{max-width:none}
+.dctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.dctl .dpick{padding:9px 10px;flex:1 1 140px;min-width:0}
+.fpanel .fclr{justify-self:start;padding:7px 12px}
+@media (max-width:760px){.fgrid{grid-template-columns:1fr 1fr}.fdate{grid-column:1/-1}}
+.ph{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.ph h2{margin:0;font-size:16px}
+.pc{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.muted.sm{font-size:12px}
+.cpb{width:34px;height:34px;border-radius:50%;background:var(--fill);color:var(--fg);display:grid;place-items:center;flex:none}
+.cpb .ic{width:18px;height:18px}
+.cpb:hover{color:var(--gold)}
+.tpanel{margin-top:4px}
+.tpanel .tbl-wrap,.tpanel .mrows,.tpanel .flist{box-shadow:none;background:var(--surface-2)}
+@media (max-width:640px){.ph .pc{width:100%}}
 /* barra inferior */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:9;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:8px max(16px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 .tabbar .in{max-width:480px;margin:0 auto;display:flex;gap:8px}
@@ -479,9 +496,10 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"
 const norm=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
 const docId=(sfid,m)=>`${sfid}__${m}`;
 /* semáforo da taxa: verde >= objetivo (50%), amarelo >= 60% do objetivo (30%), vermelho abaixo */
-const tc=t=>t==null?"var(--fg)":t>=S.objetivo?"var(--good)":t>=S.objetivo*.6?"var(--warn)":"var(--bad)";
-const tcl=t=>t==null?"":t>=S.objetivo?"up":t>=S.objetivo*.6?"mid":"dn";
-const ICO={'check': '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>', 'zero': '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6.5 17.5l11-11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>', 'undo': '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h11a5 5 0 0 1 0 10H8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 3L4 7l4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>', 'back': '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>', 'gear': '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>'};
+const rt=t=>Math.round(t*100)/100; // compara com a taxa tal como aparece no ecrã (arredondada)
+const tc=t=>t==null?"var(--fg)":rt(t)>=rt(S.objetivo)?"var(--good)":rt(t)>=rt(S.objetivo*.6)?"var(--warn)":"var(--bad)";
+const tcl=t=>t==null?"":rt(t)>=rt(S.objetivo)?"up":rt(t)>=rt(S.objetivo*.6)?"mid":"dn";
+const ICO={'img':'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="9" cy="10" r="1.6" fill="currentColor"/><path d="M4.5 17l5-4.5 3.5 3 2.5-2 4 3.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>','xls':'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M3.5 9.5h17M3.5 14.5h17M9.5 9.5V20" stroke="currentColor" stroke-width="1.9"/></svg>','check': '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>', 'zero': '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6.5 17.5l11-11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>', 'undo': '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h11a5 5 0 0 1 0 10H8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 3L4 7l4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>', 'back': '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>', 'gear': '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>'};
 const $=id=>document.getElementById(id);
 function lsGet(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
@@ -630,6 +648,7 @@ function confetti(){
 let boOk=false;
 (()=>{try{const p=sessionStorage.getItem("lp.bp");if(p){BOPASS=p;boOk=true}}catch(e){}})();
 function vLock(){
+  if($("lockF"))return; // não apagar o que já foi escrito quando os dados acabam de carregar
   $("view").innerHTML=`<div style="max-width:380px;margin:40px auto 0"><button class="back" id="boBack">‹ App das lojas</button><h1 class="title">Backoffice</h1><p class="muted" style="margin:0 0 14px">Área reservada à coordenação e aos GAs.</p>
   <form id="lockF"><label for="pw" class="lbl">Password</label><input id="pw" class="search" type="password" autocomplete="current-password" style="margin-top:6px"><p class="hint err" id="pwErr"></p><button class="save" type="submit">Entrar</button></form></div>`;
   $("boBack").onclick=()=>{location.hash="";go(S.store?"reg":"ga")};
@@ -704,7 +723,7 @@ function snapBuild(els,title,sub){
   const w=Math.max(...els.map(e=>Math.max(e.scrollWidth,e.offsetWidth,...[...e.querySelectorAll("table")].map(t=>t.scrollWidth))));
   const wrap=document.createElement("div");wrap.className="snap";wrap.style.width="max-content";wrap.style.minWidth=Math.max(560,w+40)+"px";wrap.style.background=bg;
   wrap.innerHTML=`<div class="snap-h"><div><b>${esc(title)}</b><span>${esc(sub)}</span></div><em>Liga das Portabilidades</em></div>`;
-  for(const e of els){const c=e.cloneNode(true);c.removeAttribute("id");c.querySelectorAll("button.fb,.lvl.sm").forEach(x=>x.remove());c.querySelectorAll(".tbl-wrap").forEach(x=>{x.style.overflow="visible"});wrap.appendChild(c)}
+  for(const e of els){const c=e.cloneNode(true);c.removeAttribute("id");c.querySelectorAll("button.fb,.pc,.cpb").forEach(x=>x.remove());c.querySelectorAll(".tbl-wrap").forEach(x=>{x.style.overflow="visible"});wrap.appendChild(c)}
   wrap.insertAdjacentHTML("beforeend",`<div class="snap-f">Atualizado ${new Date().toLocaleString("pt-PT",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}</div>`);
   document.body.appendChild(wrap);return wrap;
 }
@@ -754,9 +773,13 @@ function vBo(){
   const t=c?p/c:null;
   const crumbs=[["c",BO.f.c&&CANAIS[BO.f.c]]].filter(x=>x[1]);
   const gaOpts=GA_ORDER.filter(g=>!BO.f.k||STORES.some(s=>s.g===g&&s.k===BO.f.k));
-  const filt=`<div class="fbar"><label class="fsel"><span>Coordenador</span><select id="fK"><option value="">Todos</option>${Object.keys(KAMS).map(k=>`<option value="${k}" ${BO.f.k===k?"selected":""}>${KAMS[k].nome}</option>`).join("")}</select></label>
+  const filt=`<div class="fpanel"><div class="fgrid">
+    <div class="fsel fdate"><span>Data</span><div class="dctl"><div class="pseg" role="group" aria-label="Período"><button data-md="mes" aria-pressed="${BO.mode==="mes"}">Mês</button><button data-md="int" aria-pressed="${BO.mode==="int"}">Intervalo</button></div>
+      ${BO.mode==="mes"?`<select id="msel" class="dpick" aria-label="Mês">${boMonths().map(mm=>`<option value="${mm}" ${mm===a.slice(0,7)?"selected":""}>${MESES[+mm.slice(5)-1]} ${mm.slice(0,4)}</option>`).join("")}</select>`
+      :`<label class="dlab">De <input type="date" id="dfrom" class="dpick" value="${a}" min="${INICIO}" max="${tS}"></label><label class="dlab">Até <input type="date" id="dto" class="dpick" value="${b}" min="${INICIO}" max="${tS}"></label>`}</div></div>
+    <label class="fsel"><span>Coordenador</span><select id="fK"><option value="">Todos</option>${Object.keys(KAMS).map(k=>`<option value="${k}" ${BO.f.k===k?"selected":""}>${KAMS[k].nome}</option>`).join("")}</select></label>
     <label class="fsel"><span>GA</span><select id="fG"><option value="">Todos</option>${gaOpts.map(g=>`<option value="${g}" ${BO.f.g===g?"selected":""}>${g} · ${GAS[g]}</option>`).join("")}</select></label>
-    ${BO.f.k||BO.f.g||BO.f.c?`<button class="fclr" id="fClr">Limpar filtros</button>`:""}</div>`;
+    </div>${BO.f.k||BO.f.g||BO.f.c||BO.mode!=="mes"?`<button class="fclr" id="fClr">Limpar filtros</button>`:""}</div>`;
   const dl=x=>{if(x.t==null)return"—";const d=Math.round((x.t-S.objetivo)*100);return`<span class="${d>=0?"dpos":"dneg"}">${d>=0?"+":""}${d} pp</span>`};
   const N=n=>n.toLocaleString("pt-PT");
   let main="",copy=null;
@@ -771,15 +794,15 @@ function vBo(){
     const nd=daysBetween(a,b).length,minV=1,rk=scope.map(s=>({s,...(m.get(s.s)||{c:0,p:0})})).filter(x=>x.c>=minV).map(x=>({...x,t:x.p/x.c})).sort((x,y)=>y.t-x.t||y.p-x.p);
     const k=Math.min(5,Math.floor(rk.length/2)||rk.length),top=rk.slice(0,k),bot=rk.length>k?rk.slice(-k).reverse():[];
     const tb=(arr,cls,off)=>arr.map((x,i)=>`<div class="tbr"><span class="tp ${cls}">${off?rk.length-i:i+1}</span><span class="tn"><b>${esc(x.s.n)}</b><small>GA ${x.s.g}</small></span><span class="tv"><b class="num" style="color:${tc(x.t)}">${fmtPct(x.t)}</b><small class="num">${x.p}/${x.c}</small></span></div>`).join("")||`<p class="muted" style="margin:0;font-size:13px">Sem lojas com volume suficiente.</p>`;
-    main=`<div class="panel" id="snapChart" style="margin-bottom:12px"><h2>Evolução das portabilidades <span class="lvl sm" role="group" aria-label="Detalhe">${[["dia","Dia"],["sem","Semana"],["mes","Mês"]].map(([g,l])=>`<button data-gr="${g}" aria-pressed="${BO.gran===g}">${l}</button>`).join("")}</span></h2>${boChart()}
+    main=`<div class="panel" id="snapChart" style="margin-bottom:12px"><div class="ph"><h2>Evolução das portabilidades</h2><div class="pc"><div class="lvl sm" role="group" aria-label="Detalhe">${[["dia","Dia"],["sem","Semana"],["mes","Mês"]].map(([g,l])=>`<button data-gr="${g}" aria-pressed="${BO.gran===g}">${l}</button>`).join("")}</div><button class="cpb" data-snap="chart" title="Copiar imagem" aria-label="Copiar imagem: evolução">${ICO.img}</button></div></div>${boChart()}
       <div style="display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:6px;flex-wrap:wrap"><span>■ <span style="color:var(--cards)">Voz Móvel</span></span><span>■ <span style="color:var(--gold)">Portabilidades</span></span><span>% = taxa de portabilidade</span></div></div>
-    <div class="tb2" id="snapTB"><div class="panel"><h2>Top lojas <span>melhor taxa</span></h2>${tb(top,"up",false)}</div><div class="panel"><h2>Bottom lojas <span>pior taxa</span></h2>${tb(bot,"dn",true)}</div></div>
+    <div class="tb2"><div class="panel" id="snapTop"><div class="ph"><h2>Top lojas</h2><div class="pc"><span class="muted sm">melhor taxa</span><button class="cpb" data-snap="top" title="Copiar imagem" aria-label="Copiar imagem: top lojas">${ICO.img}</button></div></div>${tb(top,"up",false)}</div><div class="panel" id="snapBot"><div class="ph"><h2>Bottom lojas</h2><div class="pc"><span class="muted sm">pior taxa</span><button class="cpb" data-snap="bot" title="Copiar imagem" aria-label="Copiar imagem: bottom lojas">${ICO.img}</button></div></div>${tb(bot,"dn",true)}</div></div>
     <p class="foot" style="text-align:left;margin:6px 0 14px">Top e Bottom de ${rk.length} loja${rk.length===1?"":"s"} com vendas de Voz Móvel no período.</p>
-    <div class="bo-bar"><div class="bo-ctl"><div class="lvl" role="group" aria-label="Nível">${LEVELS.map(([k,l])=>`<button data-lv="${k}" aria-pressed="${BO.level===k}">${l}</button>`).join("")}</div><div class="lvl" role="group" aria-label="Vista"><button data-vw="resumo" aria-pressed="${BO.view==="resumo"}">Resumo</button><button data-vw="dia" aria-pressed="${BO.view==="dia"}">Por dia</button></div></div><button class="ghost" id="copy">Copiar tabela para Excel</button></div>
+    <div class="panel tpanel"><div class="ph"><h2>Resultados por ${({canal:"canal",kam:"coordenador",ga:"GA",loja:"loja"})[BO.level]}</h2><div class="pc"><div class="lvl" role="group" aria-label="Nível">${LEVELS.map(([k,l])=>`<button data-lv="${k}" aria-pressed="${BO.level===k}">${l}</button>`).join("")}</div><div class="lvl" role="group" aria-label="Vista"><button data-vw="resumo" aria-pressed="${BO.view==="resumo"}">Resumo</button><button data-vw="dia" aria-pressed="${BO.view==="dia"}">Por dia</button></div><button class="cpb" id="copy" title="Copiar para Excel" aria-label="Copiar para Excel">${ICO.xls}</button><button class="cpb" data-snap="tabela" title="Copiar imagem" aria-label="Copiar imagem: tabela">${ICO.img}</button></div></div>
     <div id="snapTbl">${MX?MX.html:`<div class="mrows">${mbody}</div><div class="tbl-wrap desk"><table class="bo"><thead><tr>${th("nm",LEVELS.find(l=>l[0]===BO.level)[1])}${th("c","Voz Móvel")}${th("p","Portab.")}${th("t","Taxa")}<th>vs objetivo</th><th></th></tr></thead>
     <tbody>${body||`<tr><td colspan="6" class="empty">Sem dados para este filtro.</td></tr>`}</tbody>
     <tfoot><tr><td>Total</td><td>${N(c)}</td><td>${N(p)}</td><td>${fmtPct(t)}</td><td>${dl({t})}</td><td></td></tr></tfoot></table></div>`}</div>
-    ${MX?`<p class="foot" style="text-align:left">Verde = dia acima do objetivo. Clica numa data para ver só esse dia.</p>`:next?`<p class="foot" style="text-align:left">Clica numa linha para ver ${({kam:"os coordenadores",ga:"os GAs",loja:"as lojas"})[next[0]]}.</p>`:""}`;
+    ${MX?`<p class="foot" style="text-align:left">Verde, amarelo e vermelho seguem o objetivo. Clica numa data para ver só esse dia.</p>`:next?`<p class="foot" style="text-align:left">Clica numa linha para ver ${({kam:"os coordenadores",ga:"os GAs",loja:"as lojas"})[next[0]]}.</p>`:""}</div>`;
     copy=()=>MX?[[LEVELS.find(l=>l[0]===BO.level)[1],...MX.days.map(dm)].join("\t"),...rows.map(r=>[r.nm,...MX.days.map(d=>{const v=MX.cell[r.key+"|"+d];return v&&v.c?(v.p/v.c*100).toFixed(1).replace(".",",")+"%":""})].join("\t"))].join("\n")
       :[[LEVELS.find(l=>l[0]===BO.level)[1],"Voz Móvel","Portabilidades","Taxa"].join("\t"),...rows.map(x=>[x.nm,x.c,x.p,x.t==null?"":(x.t*100).toFixed(1).replace(".",",")+"%"].join("\t"))].join("\n");
     var after=()=>{
@@ -799,8 +822,8 @@ function vBo(){
         ${x.mis?`<button class="fb" data-open="${esc(x.key)}" aria-expanded="${open}">${open?"− detalhe":"+ detalhe"}</button>`:`<span class="fb ph"></span>`}</div>
         ${open&&x.mis?`<div class="fd">${isL?`<span class="muted">Dias em falta:</span> ${dts(x.st[0].mi)}`:x.st.map(y=>`<div><span>${esc(y.s.n)}${BO.mlevel==="kam"?` <span class="muted">· ${y.s.g}</span>`:""}</span><span>${y.mi.length} dia${y.mi.length>1?"s":""}: ${dts(y.mi)}</span></div>`).join("")}</div>`:""}</div>`}).join("");
     main=`<div class="kpis k3" id="snapFK"><div class="kpi"><b class="num" style="color:${misT?"var(--bad)":"var(--good)"}">${N(misT)}<small>/${N(expT)}</small></b><span>Dias em falta</span></div><div class="kpi"><b class="num">${lojF}<small>/${scope.length}</small></b><span>Lojas com dias em falta</span></div><div class="kpi"><b class="num">${hj}<small>/${scope.length}</small></b><span>Lojas com registo hoje</span></div></div>
-    <div class="bo-bar"><div class="lvl" role="group" aria-label="Nível">${[["kam","Coordenadores"],["ga","GAs"],["loja","Lojas"]].map(([k,l])=>`<button data-ml="${k}" aria-pressed="${BO.mlevel===k}">${l}</button>`).join("")}</div><button class="ghost" id="copy">Copiar para Excel</button></div>
-    ${ex.length?`<div class="flist" id="snapFalta">${list}</div>`:`<div class="panel"><p class="muted" style="margin:0">Ainda não há dias fechados neste período. O dia de hoje só conta a partir de amanhã.</p></div>`}
+    <div class="panel tpanel"><div class="ph"><h2>Dias em falta por ${({kam:"coordenador",ga:"GA",loja:"loja"})[BO.mlevel]}</h2><div class="pc"><div class="lvl" role="group" aria-label="Nível">${[["kam","Coordenadores"],["ga","GAs"],["loja","Lojas"]].map(([k,l])=>`<button data-ml="${k}" aria-pressed="${BO.mlevel===k}">${l}</button>`).join("")}</div><button class="cpb" id="copy" title="Copiar para Excel" aria-label="Copiar para Excel">${ICO.xls}</button><button class="cpb" data-snap="falta" title="Copiar imagem" aria-label="Copiar imagem: dados em falta">${ICO.img}</button></div></div>
+    ${ex.length?`<div class="flist" id="snapFalta">${list}</div>`:`<p class="muted" style="margin:0">Ainda não há dias fechados neste período. O dia de hoje só conta a partir de amanhã.</p>`}</div>
     <p class="foot" style="text-align:left">Conta os dias de ${dm(a)} a ${dm(b)} até ontem. Um dia com 0 vendas guardado conta como preenchido.</p>`;
     copy=()=>[["Nome","Dias em falta","Dias esperados","Detalhe"].join("\t"),...rows.map(x=>[x.nm,x.mis,x.exp,x.st.map(y=>(isL?"":y.s.n+": ")+y.mi.map(dm).join(" ")).join(" | ")].join("\t"))].join("\n");
     var after=()=>{
@@ -808,13 +831,9 @@ function vBo(){
       document.querySelectorAll("[data-open]").forEach(x=>x.onclick=()=>{const k=BO.mlevel+"|"+x.dataset.open;BO.open.has(k)?BO.open.delete(k):BO.open.add(k);const y=scrollY;render();scrollTo(0,y)});
     };
   }
-  $("view").innerHTML=`<div class="bo-top"><div><button class="back" id="boBack">${ICO.back}<span>App das lojas</span></button><div class="bo-tt"><h1>Backoffice portabilidades</h1><button class="gearb" id="boCfg" aria-label="Definições" title="Definições">${ICO.gear}</button></div></div>
-    <div class="bo-ctl"><div class="pseg" role="group" aria-label="Período"><button data-md="mes" aria-pressed="${BO.mode==="mes"}">Mês</button><button data-md="int" aria-pressed="${BO.mode==="int"}">Intervalo</button></div>
-    ${BO.mode==="mes"?`<select id="msel" class="dpick" aria-label="Mês">${boMonths().map(mm=>`<option value="${mm}" ${mm===a.slice(0,7)?"selected":""}>${MESES[+mm.slice(5)-1]} ${mm.slice(0,4)}</option>`).join("")}</select>`
-    :`<label class="dlab">De <input type="date" id="dfrom" class="dpick" value="${a}" min="${INICIO}" max="${tS}"></label><label class="dlab">Até <input type="date" id="dto" class="dpick" value="${b}" min="${INICIO}" max="${tS}"></label>`}</div></div>
+  $("view").innerHTML=`<div class="bo-top"><div><button class="back" id="boBack">${ICO.back}<span>App das lojas</span></button><div class="bo-tt"><h1>Backoffice portabilidades</h1><button class="gearb" id="boCfg" aria-label="Definições" title="Definições">${ICO.gear}</button></div></div></div>
   <div class="tabs" role="tablist" id="boTabs"><button role="tab" data-tab="res" aria-selected="${BO.tab==="res"}">Resultados</button><button role="tab" data-tab="falta" aria-selected="${BO.tab==="falta"}">Dados em falta</button></div>
   ${filt}
-  <div class="sharebar"><span>Partilhar imagem</span>${BO.tab==="res"?`<button data-snap="resumo">Resumo</button><button data-snap="tb">Top / Bottom</button><button data-snap="tabela">Tabela</button>`:`<button data-snap="falta">Dados em falta</button>`}</div>
   ${crumbs.length?`<div class="crumbs"><span class="muted">Filtro:</span>${crumbs.map(([k,l])=>`<span class="crumb">${esc(l)}<button data-rm="${k}" aria-label="Remover filtro">✕</button></span>`).join("")}</div>`:""}
   ${BO.tab==="res"?`<div class="kpis k3" id="snapKpi"><div class="kpi"><b class="num" style="color:var(--cards)">${N(c)}</b><span>Voz Móvel</span></div><div class="kpi"><b class="num" style="color:var(--gold)">${N(p)}</b><span>Portabilidades</span></div><div class="kpi"><b class="num" style="color:${tc(t)}">${fmtPct(t)}</b><span>Taxa · objetivo ${fmtPct(S.objetivo)}</span></div></div>`:""}
   ${main}`;
@@ -826,13 +845,13 @@ function vBo(){
   if($("dto"))$("dto").onchange=e=>{if(e.target.value){BO.to=e.target.value;if(!BO.from)BO.from=a;render()}};
   document.querySelectorAll("[data-tab]").forEach(x=>x.onclick=()=>{BO.tab=x.dataset.tab;render()});
   const ctx=()=>{const per=BO.mode==="mes"?`${MESES[+a.slice(5,7)-1]} ${a.slice(0,4)}`:(a===b?dm(a):`${dm(a)} a ${dm(b)}`);const sc=BO.f.g?`GA ${BO.f.g} · ${GAS[BO.f.g]}`:BO.f.k?`${KAMS[BO.f.k].nome}`:BO.f.c?CANAIS[BO.f.c]:"Rede continente";return `${per} · ${sc}`};
-  const SN={resumo:[["snapKpi","snapChart"],"Resumo"],tb:[["snapTB"],"Top e Bottom lojas"],tabela:[["snapTbl"],`Resultados por ${LEVELS.find(l=>l[0]===BO.level)[1].toLowerCase()}`],falta:[["snapFK","snapFalta"],"Dados em falta"]};
+  const SN={chart:[["snapKpi","snapChart"],"Evolução das portabilidades"],top:[["snapTop"],"Top lojas"],bot:[["snapBot"],"Bottom lojas"],tabela:[["snapTbl"],`Resultados por ${({canal:"canal",kam:"coordenador",ga:"GA",loja:"loja"})[BO.level]}`],falta:[["snapFK","snapFalta"],"Dados em falta"]};
   document.querySelectorAll("[data-snap]").forEach(x=>x.onclick=()=>{const[ids,t]=SN[x.dataset.snap];const els=ids.map(i=>$(i)).filter(Boolean);if(!els.length){toast("Nada para partilhar.");return}snapShare(els,t,ctx())});
   document.querySelectorAll("[data-rm]").forEach(x=>x.onclick=()=>{delete BO.f[x.dataset.rm];render()});
   const saveF=()=>lsSet("lp.bof",{k:BO.f.k||null,g:BO.f.g||null});
   $("fK").onchange=e=>{BO.f.k=e.target.value||undefined;if(BO.f.g&&BO.f.k&&!STORES.some(s=>s.g===BO.f.g&&s.k===BO.f.k))BO.f.g=undefined;if(BO.f.k&&BO.level==="canal")BO.level="ga";saveF();render()};
   $("fG").onchange=e=>{const g=e.target.value||undefined;BO.f.g=g;if(g){BO.f.k=(STORES.find(s=>s.g===g)||{}).k;if(BO.level!=="loja")BO.level="loja";if(BO.mlevel!=="loja")BO.mlevel="loja"}saveF();render()};
-  if($("fClr"))$("fClr").onclick=()=>{BO.f={};saveF();render()};
+  if($("fClr"))$("fClr").onclick=()=>{BO.f={};BO.mode="mes";BO.month=null;BO.from=BO.to=null;saveF();render()};
   after();
   if($("copy"))$("copy").onclick=()=>{try{navigator.clipboard.writeText(copy()).then(()=>toast("Copiado. Cola no Excel."),()=>toast("Não foi possível copiar."))}catch(e){toast("Não foi possível copiar.")}};
 }
