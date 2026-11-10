@@ -427,6 +427,10 @@ table.bo tfoot td,table.mxt thead .stk,table.mxt tfoot .stk{background:var(--sur
 .tpanel{margin-top:4px}
 .tpanel .tbl-wrap,.tpanel .mrows,.tpanel .flist{box-shadow:none;background:var(--surface-2)}
 @media (max-width:640px){.ph .pc{width:100%}}
+.cfg-sep{height:.5px;background:var(--line);margin:2px 0}
+.cfg-d{display:grid;grid-template-columns:1fr 160px;gap:10px;align-items:center}
+.cfg-d input{height:42px;border:0;border-radius:10px;background:var(--fill);color:var(--fg);font:500 15px var(--f-body);padding:0 10px;width:100%;color-scheme:dark}
+@media (max-width:420px){.cfg-d{grid-template-columns:1fr}}
 /* barra inferior */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:9;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:8px max(16px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 .tabbar .in{max-width:480px;margin:0 auto;display:flex;gap:8px}
@@ -478,6 +482,7 @@ const GA_ORDER=Object.keys(GAS).sort();
 const GRADS=["#c25cff,#5b4dff","#5b4dff,#2fd0ff","#2fd0ff,#2ef2b0","#ff5ac8,#9b5cff","#ff8a5c,#ff3d9a","#ffb347,#ff5f6d","#2ef2b0,#8be04e","#8f8cff,#d7a8ff","#00c6ff,#3d6bff","#f857a6,#ff6a5c","#43e97b,#38d9f9","#b28cff,#ff9de2","#ff6f91,#ffc75f"];
 const MIN_CARTOES=5;
 let INICIO="2026-11-09"; // primeiro dia de registo (vem da base de dados)
+let FALTA=null; // primeiro dia contado como "em falta" (margem para as equipas); null = igual ao início
 const BY=new Map(STORES.map(s=>[s.s,s]));
 const S={screen:"ga",ga:null,store:null,q:"",day:0,rankScope:"ga",objetivo:0.5,canWrite:null,isAdmin:false};
 const DOCS=new Map();
@@ -553,7 +558,8 @@ function vLoja(){
 function selDate(){return S.date||ymd(today())}
 function daysBetween(a,b){const o=[];for(let d=new Date(a+"T00:00");ymd(d)<=b;d=addDays(d,1))o.push(ymd(d));return o}
 /* dias que uma loja tem de ter preenchidos: desde INICIO até ontem (hoje ainda está a decorrer) */
-function expDays(a,b,inclToday){const t=ymd(today()),lim=inclToday?t:ymd(addDays(today(),-1));if(a<INICIO)a=INICIO;if(b>lim)b=lim;return a>b?[]:daysBetween(a,b)}
+const faltaDesde=()=>FALTA&&FALTA>INICIO?FALTA:INICIO;
+function expDays(a,b,inclToday){const t=ymd(today()),lim=inclToday?t:ymd(addDays(today(),-1)),st=faltaDesde();if(a<st)a=st;if(b>lim)b=lim;return a>b?[]:daysBetween(a,b)}
 function missing(sfid,days){return days.filter(d=>!dayEntry(sfid,d))}
 const dm=d=>`${+d.slice(8)}/${+d.slice(5,7)}`;
 function vReg(){
@@ -565,7 +571,7 @@ function vReg(){
   const [cy,cm]=calM.split("-").map(Number),first=new Date(cy,cm-1,1),nd=new Date(cy,cm,0).getDate(),lead=(first.getDay()+6)%7;
   let cells=["S","T","Q","Q","S","S","D"].map(w=>`<span class="wd">${w}</span>`).join("")+"<span></span>".repeat(lead);
   for(let i=1;i<=nd;i++){const d=`${calM}-${pad(i)}`,e=dayEntry(s.s,d),fut=d>tS,pre=d<INICIO;
-    const cls=[e?"ok":"",!e&&!fut&&!pre&&d<tS?"cmiss":"",d===date?"sel":""].join(" ");
+    const cls=[e?"ok":"",!e&&!fut&&!pre&&d<tS&&d>=faltaDesde()?"cmiss":"",d===date?"sel":""].join(" ");
     cells+=`<button class="cd ${cls}" data-date="${d}" ${fut||pre?"disabled":""} aria-label="${i}${e?", preenchido":(!fut&&!pre&&d<tS?", em falta":"")}">${i}</button>`}
   const falta=missing(s.s,expDays(INICIO,tS,false));
   const alertH=falta.length?`<div class="alert"><b>${falta.length} dia${falta.length>1?"s":""} por preencher</b></div>`:`<div class="alert okk"><b>${dayEntry(s.s,tS)?"Todos os dias preenchidos.":"Em dia. Falta só registar hoje."}</b></div>`;
@@ -751,6 +757,7 @@ function snapSheet(blob,fname){
   d.querySelector("#shC").onclick=()=>{try{navigator.clipboard.write([new ClipboardItem({"image/png":blob})]).then(()=>{toast("Imagem copiada.");close()},()=>toast("Copiar não é suportado aqui. Usa Partilhar ou Guardar."))}catch(e){toast("Copiar não é suportado aqui. Usa Partilhar ou Guardar.")}};
 }
 async function saveObjetivo(v){await rpc("bo_objetivo",{p_pass:BOPASS,p_valor:v})}
+async function saveDatas(i,f){await rpc("bo_datas",{p_pass:BOPASS,p_inicio:i,p_falta:f})}
 function boLogout(){boOk=false;BOPASS=null;boLoaded=false;try{sessionStorage.removeItem("lp.bp");sessionStorage.removeItem("lp.bo")}catch(e){}location.hash="";document.body.classList.remove("bo");go(S.store?"reg":"ga")}
 function boSettings(){
   const d=document.createElement("div");d.className="sheet";
@@ -758,11 +765,22 @@ function boSettings(){
     <label class="cfg-l" for="cfObj">Objetivo da taxa de portabilidade</label>
     <div class="cfg-r"><input id="cfObj" type="number" inputmode="numeric" min="1" max="100" value="${Math.round(S.objetivo*100)}"><span>%</span><button class="save" id="cfS">${ICO.check}Guardar</button></div>
     <p class="cfg-n">Cores da taxa: verde a partir do objetivo, amarelo a partir de ${Math.round(S.objetivo*60)}%, vermelho abaixo.</p>
+    <div class="cfg-sep"></div>
+    <div class="cfg-d"><label class="cfg-l" for="cfIni">Início dos registos</label><input id="cfIni" type="date" value="${INICIO}" max="${ymd(today())}"></div>
+    <div class="cfg-d"><label class="cfg-l" for="cfFal">Contar dias em falta a partir de</label><input id="cfFal" type="date" value="${faltaDesde()}"></div>
+    <p class="cfg-n" id="cfDn">As lojas podem registar desde o início dos registos. Os dias antes da segunda data não contam como em falta, para dar margem às equipas.</p>
+    <button class="save" id="cfDs">${ICO.check}Guardar datas</button>
+    <div class="cfg-sep"></div>
     <button class="act del on" id="cfOut">Terminar sessão do Backoffice</button></div>`;
   document.body.appendChild(d);
   const close=()=>d.remove();d.onclick=e=>{if(e.target===d)close()};d.querySelector("#cfX").onclick=close;
   d.querySelector("#cfObj").oninput=e=>{const v=Math.max(1,Math.min(100,parseInt(e.target.value)||50));d.querySelector(".cfg-n").textContent=`Cores da taxa: verde a partir de ${v}%, amarelo a partir de ${Math.round(v*.6)}%, vermelho abaixo.`};
   d.querySelector("#cfS").onclick=async()=>{const v=Math.max(1,Math.min(100,parseInt(d.querySelector("#cfObj").value)||50))/100;try{await saveObjetivo(v);S.objetivo=v;close();render();toast("Objetivo atualizado.")}catch(e){toast("Não foi possível guardar o objetivo.")}};
+  d.querySelector("#cfDs").onclick=async()=>{const i=d.querySelector("#cfIni").value,f=d.querySelector("#cfFal").value,n=d.querySelector("#cfDn");
+    if(!i||!f){n.textContent="Escolhe as duas datas.";n.style.color="var(--bad)";return}
+    if(f<i){n.textContent="A contagem de dias em falta não pode começar antes do início dos registos.";n.style.color="var(--bad)";return}
+    if(i>ymd(today())){n.textContent="O início dos registos não pode ser no futuro.";n.style.color="var(--bad)";return}
+    try{await saveDatas(i,f);INICIO=i;FALTA=f;close();boLoaded=false;render();toast("Datas atualizadas.")}catch(e){toast("Não foi possível guardar as datas.")}};
   d.querySelector("#cfOut").onclick=()=>{close();boLogout()};
 }
 function vBo(){
@@ -863,6 +881,7 @@ async function refresh(){
   if(!db)return;
   try{
     if(S.screen==="bo"){if(boOk&&BOPASS)await loadBO();return}
+    try{const cfg=await rpc("liga_config");if(cfg){if(cfg.inicio)INICIO=cfg.inicio;if(cfg.falta)FALTA=cfg.falta;const v=+cfg.objetivo;if(v>0&&v<=1)S.objetivo=v}}catch(_){}
     await loadPub();if(S.store)await loadStore(S.store);note="";
   }catch(e){note="<b>Sem ligação.</b> Os números podem estar desatualizados."}
   const ae=document.activeElement;if(ae&&(/^in[CP]$/.test(ae.id)||ae.id==="q"||ae.id==="pw"))return;
@@ -873,6 +892,7 @@ async function refresh(){
   try{
     const cfg=await rpc("liga_config");db=true;
     if(cfg&&cfg.inicio)INICIO=cfg.inicio;
+    if(cfg&&cfg.falta)FALTA=cfg.falta;
     const v=+(cfg&&cfg.objetivo);if(v>0&&v<=1)S.objetivo=v;
     await loadPub();if(S.store)await loadStore(S.store);
   }catch(e){db=null}
