@@ -611,14 +611,14 @@ function vReg(){
   $("save").onclick=save;upd();
 }
 function upd(){
-  const{c,p}=draft,t=c?p/c:null,bad=p>c;
+  const{c,p}=draft,t=c?p/c:null,bad=false,extra=p>c;
   $("tx").textContent=fmtPct(t);$("tx").style.color=tc(t);$("bar").style.background=t==null?"":tc(t);$("bar").style.width=(t==null?0:Math.min(1,t)*100)+"%";
   const h=$("hint");h.classList.toggle("err",bad);
-  h.textContent=bad?"Não podes ter mais portabilidades do que Voz Móvel.":t==null?"Se não houve vendas neste dia, carrega em Sem vendas.":t>=S.objetivo?"Acima do objetivo. Boa!":t>=S.objetivo*.6?"Perto do objetivo.":"Abaixo do objetivo.";
+  h.textContent=extra?"Mais portabilidades do que Voz Móvel: conta as portabilidades de vendas de outros dias. Podes guardar.":t==null?"Se não houve vendas neste dia, carrega em Sem vendas.":t>=S.objetivo?"Acima do objetivo. Boa!":t>=S.objetivo*.6?"Perto do objetivo.":"Abaixo do objetivo.";
   const b=$("save");b.disabled=bad||!db||S.canWrite===false||saving;b.innerHTML=saving?"A guardar…":ICO.check+(draft.had?"Guardar correção":"Guardar registo");const z=$("zero");if(z)z.disabled=!db||S.canWrite===false||saving;
 }
 async function save(del){
-  del=del===true;if(!db||saving)return;const s=BY.get(S.store),{date,c,p,had}=draft;if(!del&&p>c)return;
+  del=del===true;if(!db||saving)return;const s=BY.get(S.store),{date,c,p,had}=draft;
   saving=true;upd();
   try{
     if(del){await rpc("apagar_registo",{p_sfid:s.s,p_dia:date});dropRow(s.s,date)}
@@ -631,7 +631,7 @@ async function save(del){
     else toast(had?"Dia corrigido.":"Guardado.");
   }catch(e){
     saving=false;upd();
-    const m={dia_invalido:"Esse dia não pode ser registado.",valores_invalidos:"Verifica os números: as portabilidades não podem ser mais do que a Voz Móvel.",loja_invalida:"Loja não encontrada. Volta a escolher a loja."};
+    const m={dia_invalido:"Esse dia não pode ser registado.",valores_invalidos:"Verifica os números (máximo 999).",loja_invalida:"Loja não encontrada. Volta a escolher a loja."};
     toast(m[e&&e.code]||"Não foi possível guardar. Verifica a internet e tenta outra vez.");
   }
 }
